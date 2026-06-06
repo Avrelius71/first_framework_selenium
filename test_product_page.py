@@ -26,6 +26,40 @@ def test_guest_can_add_product_to_basket(browser, link):
     page.open()
     product_name = page.get_product_name()
     product_price = page.get_product_price()
-    page.add_product_to_basket()
+    page.add_product_to_basket(should_solve_quiz=True)
     page.should_be_product_name_in_message(product_name)
     page.should_be_basket_total_equals_product_price(product_price)
+
+
+@pytest.mark.xfail(reason="Expected fail: success message appears after adding product")
+def test_guest_cant_see_success_message_after_adding_product_to_basket(browser):
+    link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+    page = ProductPage(browser, link)
+    page.open()
+    page.add_product_to_basket()
+    page.should_not_be_success_message()
+
+
+def test_guest_cant_see_success_message(browser):
+    link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+    page = ProductPage(browser, link)
+    page.open()
+    page.should_not_be_success_message()
+
+
+def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
+    link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+    page = ProductPage(browser, link)
+    page.open()
+    basket_page = page.go_to_basket_page()
+    basket_page.should_not_be_product_in_basket()
+    basket_page.should_be_empty_basket_message()
+
+
+@pytest.mark.xfail(reason="Expected fail: success message stays in DOM")
+def test_message_disappeared_after_adding_product_to_basket(browser):
+    link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+    page = ProductPage(browser, link)
+    page.open()
+    page.add_product_to_basket()
+    page.should_disappear_success_message()
